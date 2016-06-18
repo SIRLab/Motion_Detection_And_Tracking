@@ -13,9 +13,16 @@ protected:
 	Mat in, out;
 	Ptr<BackgroundSubtractor> pMOG2;
 	VideoCapture capture;
+	
+	vector<vector<Point> > labels;
+	vector<vector<Point> > contours;
+	vector<Vec4i> hierarchy;
+
 	char key;
 
 	void extract_background();
+	void get_countours();
+	//void detect_human();
 
 public:
 	MDT();
