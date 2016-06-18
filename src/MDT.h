@@ -64,8 +64,10 @@ public:
 
 	void detect_and_track();
 
-	void initKF(Point ball = Point(0, 0));
+	void init_sim_KF();
 	void simKF();
+
+	void init_KF(Point pos = Point(0, 0));
 	void applyKF();
 };
 

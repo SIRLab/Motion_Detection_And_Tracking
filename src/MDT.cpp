@@ -65,46 +65,34 @@ bool MDT::blobFilter(Rect rect){
 }
 
 void MDT::applyKF(){
-	double state_x = state_X.at<float>(0);
-	double state_y = state_Y.at<float>(0);
-
     system("clear");
-    
-    cout << "state" << endl;
-    cout << state_X << endl;
-
-	prediction_X = KFX.predict();
-	prediction_Y = KFY.predict();
-
-    cout << "prediction" << endl;
-    cout << prediction_X << endl;
-
-	double predict_x = prediction_X.at<float>(0);
-	double predict_y = prediction_Y.at<float>(0);
 
 	measurement_X.at<float>(0) = act_measurement.x;
 	measurement_Y.at<float>(0) = act_measurement.y;
 
-    cout << "measurement" << endl;
-    cout << measurement_X << endl;
+	prediction_X = KFX.predict();
+	prediction_Y = KFY.predict();
 
-	drawCross(Point(state_x, state_y), Scalar(255, 255, 255));
-	drawCross(Point(measurement_X.at<float>(0), measurement_Y.at<float>(0)), Scalar(0, 0, 255));
-	drawCross(Point(predict_x, predict_y), Scalar(0, 255, 0));
+    cout << "Prediction Point(" << prediction_X.at<float>(0) << ", " << prediction_Y.at<float>(0) << ")" << endl;
+    cout << "Measurement Point(" << measurement_X.at<float>(0) << ", " << measurement_Y.at<float>(0) << ")" << endl;
+
+	//drawCross(Point(state_x, state_y), Scalar(255, 255, 255));
+	drawCross(Point(measurement_X.at<float>(0), measurement_Y.at<float>(0)), Scalar(255, 255, 255));
+	drawCross(Point(prediction_X.at<float>(0), prediction_Y.at<float>(0)), Scalar(0, 255, 0));
 
 	if(theRNG().uniform(0,4) != 0){
     	KFX.correct(measurement_X);
     	KFY.correct(measurement_Y);
 	}
 
-    state_X = KFX.transitionMatrix*state_X + ((act_measurement.x - old_measurement.x) *0.01);
-	state_Y = KFY.transitionMatrix*state_Y + ((act_measurement.y - old_measurement.y) *0.01);
+    //state_X = KFX.transitionMatrix*state_X + ((act_measurement.x - old_measurement.x) *0.01);
+	//state_Y = KFY.transitionMatrix*state_Y + ((act_measurement.y - old_measurement.y) *0.01);
 
     cout << endl;
 }
 
 void MDT::simKF(){
-    initKF();
+    init_sim_KF();
     while(true){
     	double state_x = state_X.at<float>(0);
 		double state_y = state_Y.at<float>(0);
@@ -173,7 +161,7 @@ void MDT::simKF(){
     }
 }
 
-void MDT::initKF(Point ball){
+void MDT::init_sim_KF(){
 	in = Mat(500, 500, CV_8UC3);
 
     KFX = KalmanFilter(2, 1, 0);
@@ -213,14 +201,54 @@ void MDT::initKF(Point ball){
     randn(KFY.statePost, Scalar::all(0), Scalar::all(0.1));
 }
 
+void MDT::init_KF(Point pos){
+    KFX = KalmanFilter(2, 1, 0);
+    KFY = KalmanFilter(2, 1, 0);
+
+    state_X = Mat(2, 1, CV_32F);
+    state_Y = Mat(2, 1, CV_32F);
+
+    processNoise_X = Mat(2, 1, CV_32F);
+    processNoise_Y = Mat(2, 1, CV_32F);
+
+    measurement_X = Mat::zeros(1, 1, CV_32F);
+    measurement_Y = Mat::zeros(1, 1, CV_32F);
+
+    code = (char)-1;
+
+    //randn(state_X, Scalar::all(0), Scalar::all(0.2));
+	//randn(state_Y, Scalar::all(0), Scalar::all(0.2));
+
+    cout << "first state" << endl;
+    cout << state_X << endl;
+
+	KFX.transitionMatrix = (Mat_<float>(2, 2) << 1, 1, 0, 1);
+	KFY.transitionMatrix = (Mat_<float>(2, 2) << 1, 1, 0, 1);
+
+	setIdentity(KFX.measurementMatrix);
+    setIdentity(KFX.processNoiseCov, Scalar::all(1e-5));
+    setIdentity(KFX.measurementNoiseCov, Scalar::all(1e-1));
+    setIdentity(KFX.errorCovPost, Scalar::all(1.0));
+
+    setIdentity(KFY.measurementMatrix);
+    setIdentity(KFY.processNoiseCov, Scalar::all(1e-5));
+    setIdentity(KFY.measurementNoiseCov, Scalar::all(1e-1));
+    setIdentity(KFY.errorCovPost, Scalar::all(1.0));
+
+    randn(KFX.statePost, Scalar::all(0), Scalar::all(0.1));
+    randn(KFY.statePost, Scalar::all(0), Scalar::all(0.1));
+    //cout << KFY.statePost << endl;
+
+    KFX.statePost.at<float>(0) = pos.x;
+    KFY.statePost.at<float>(0) = pos.y;
+}
+
 void MDT::detect_and_track(){
 	//capture = VideoCapture(0);
 	//capture = VideoCapture("database/students/video.avi");
 	//capture = VideoCapture("database/vss/video.mp4");
 	capture = VideoCapture("database/ball/straight_1.mp4");
 	//initKalman();
-
-	initKF();
 
 	while(true){
 		//if(loop % 5 == 0){
@@ -234,7 +262,11 @@ void MDT::detect_and_track(){
 		inRange(in, Scalar(0, 0, 80), Scalar(60, 255, 255), out);
 
 		if(act_measurement.x != 0){
+			if(loop < 1)
+				init_KF(act_measurement);
+			
 			applyKF();
+			loop++;
 		}
 	    //extract_background();
 	    
@@ -246,10 +278,8 @@ void MDT::detect_and_track(){
 	   
 
 	    imshow("in", in);
-	    //imshow("out", out);
 
 	    key = waitKey(100);
-	    loop++;
 	}
 }
 
