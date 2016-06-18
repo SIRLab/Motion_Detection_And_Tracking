@@ -80,7 +80,7 @@ void MDT::applyKF(){
 	drawCross(Point(measurement_X.at<float>(0), measurement_Y.at<float>(0)), Scalar(255, 255, 255));
 	drawCross(Point(prediction_X.at<float>(0), prediction_Y.at<float>(0)), Scalar(0, 255, 0));
 
-	if(theRNG().uniform(0,4) != 0){
+	if(theRNG().uniform(0,5) != 0){
     	KFX.correct(measurement_X);
     	KFY.correct(measurement_Y);
 	}
@@ -227,12 +227,12 @@ void MDT::init_KF(Point pos){
 
 	setIdentity(KFX.measurementMatrix);
     setIdentity(KFX.processNoiseCov, Scalar::all(1e-5));
-    setIdentity(KFX.measurementNoiseCov, Scalar::all(1e-3));
+    setIdentity(KFX.measurementNoiseCov, Scalar::all(1e-4));
     setIdentity(KFX.errorCovPost, Scalar::all(1.0));
 
     setIdentity(KFY.measurementMatrix);
     setIdentity(KFY.processNoiseCov, Scalar::all(1e-5));
-    setIdentity(KFY.measurementNoiseCov, Scalar::all(1e-3));
+    setIdentity(KFY.measurementNoiseCov, Scalar::all(1e-4));
     setIdentity(KFY.errorCovPost, Scalar::all(1.0));
 
     randn(KFX.statePost, Scalar::all(0), Scalar::all(0.1));
@@ -261,13 +261,6 @@ void MDT::detect_and_track(){
 
 		inRange(in, Scalar(0, 0, 80), Scalar(60, 255, 255), out);
 
-		if(act_measurement.x != 0){
-			if(loop < 1)
-				init_KF(act_measurement);
-			
-			applyKF();
-			loop++;
-		}
 	    //extract_background();
 	    
 	    medianBlur(out, out, 3);
@@ -275,6 +268,17 @@ void MDT::detect_and_track(){
 	    bisects_gray();
 	    
 	    get_countours();
+
+	    if(act_measurement.x != 0){
+			if(loop < 1)
+				init_KF(act_measurement);
+			
+			/*if(loop > 30 && loop < 40){
+				act_measurement = Point(-1, -1);
+			}*/
+			applyKF();
+			loop++;
+		}
 	   
 
 	    imshow("in", in);
