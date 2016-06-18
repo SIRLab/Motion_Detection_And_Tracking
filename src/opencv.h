@@ -8,6 +8,7 @@
 #include "opencv2/videoio.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/video.hpp"
+#include "opencv2/core.hpp"
 
 using namespace cv;
 

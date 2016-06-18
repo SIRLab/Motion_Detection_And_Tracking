@@ -10,7 +10,7 @@ using namespace std;
 
 class MDT{
 protected:
-	Mat in, out;
+	Mat in, out, out2;
 	Ptr<BackgroundSubtractor> pMOG2;
 	VideoCapture capture;
 	
@@ -22,6 +22,8 @@ protected:
 
 	void extract_background();
 	void get_countours();
+	void bisects_gray();
+	
 	//void detect_human();
 
 public:

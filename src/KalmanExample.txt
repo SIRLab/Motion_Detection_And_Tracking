@@ -24,7 +24,9 @@ using namespace std;
 // >>>>> Color to be tracked
 #define MIN_H_BLUE 200
 #define MAX_H_BLUE 300
-// <<<<< Color to be tracked   int main() {    // Camera frame    cv::Mat frame;      // >>>> Kalman Filter
+// <<<<< Color to be tracked
+// 
+int main() {    // Camera frame    cv::Mat frame;      // >>>> Kalman Filter
    int stateSize = 6;
    int measSize = 4;
    int contrSize = 0;

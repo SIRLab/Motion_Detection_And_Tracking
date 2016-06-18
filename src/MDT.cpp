@@ -6,11 +6,13 @@ MDT::MDT(){
 
 void MDT::extract_background(){
     pMOG2->apply(in, out);
+    out2 = out.clone();
 }
 
 void MDT::get_countours(){
 	vector<Point> game;	
-	medianBlur(out, out, 3);
+	
+	imshow("Median", out);
 	findContours(out, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 	vector<vector<Point> > contours_poly( contours.size() );
 	vector<Rect> boundRect( contours.size() );
@@ -32,6 +34,15 @@ void MDT::get_countours(){
 	hierarchy.clear();
 }
 
+void MDT::bisects_gray(){
+	/*for(int i = 0 ; i < in.cols ; i++){
+		for(int j = 0 ; j < in.rows ; j++){
+			Vec3b p = in.at<Vec3b>(j,i);
+			cout << (int)p[0] << ", " << (int)p[1] << ", " << (int)p[2] << endl;
+		}
+	}*/
+}
+
 void MDT::detect_and_track(){
 	//capture = VideoCapture(0);
 	capture = VideoCapture("database/students/video.avi");
@@ -44,7 +55,15 @@ void MDT::detect_and_track(){
 	    }
 
 	    extract_background();
+	    
+	    imshow("MOG", out);
+	    
+	    medianBlur(out, out, 3);
+	    
+	    bisects_gray();
+	    
 	    get_countours();
+	   
 
 	    imshow("in", in);
 	    imshow("out", out);
