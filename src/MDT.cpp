@@ -227,12 +227,12 @@ void MDT::init_KF(Point pos){
 
 	setIdentity(KFX.measurementMatrix);
     setIdentity(KFX.processNoiseCov, Scalar::all(1e-5));
-    setIdentity(KFX.measurementNoiseCov, Scalar::all(1e-1));
+    setIdentity(KFX.measurementNoiseCov, Scalar::all(1e-3));
     setIdentity(KFX.errorCovPost, Scalar::all(1.0));
 
     setIdentity(KFY.measurementMatrix);
     setIdentity(KFY.processNoiseCov, Scalar::all(1e-5));
-    setIdentity(KFY.measurementNoiseCov, Scalar::all(1e-1));
+    setIdentity(KFY.measurementNoiseCov, Scalar::all(1e-3));
     setIdentity(KFY.errorCovPost, Scalar::all(1.0));
 
     randn(KFX.statePost, Scalar::all(0), Scalar::all(0.1));
