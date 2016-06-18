@@ -24,7 +24,6 @@ void MDT::extract_background(){
 void MDT::get_countours(){
 	vector<Point> game;	
 	
-	imshow("Median", out);
 	findContours(out, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 	vector<vector<Point> > contours_poly( contours.size() );
 	vector<Rect> boundRect( contours.size() );
@@ -173,7 +172,8 @@ void MDT::initKF(){
 void MDT::detect_and_track(){
 	//capture = VideoCapture(0);
 	//capture = VideoCapture("database/students/video.avi");
-	capture = VideoCapture("database/vss/video.mp4");
+	//capture = VideoCapture("database/vss/video.mp4");
+	capture = VideoCapture("database/ball/straight_1.mp4");
 	//initKalman();
 	while(true){
 		if(!capture.read(in) || key == 27) {
@@ -182,15 +182,7 @@ void MDT::detect_and_track(){
 	        exit(EXIT_FAILURE);
 	    }
 
-	    Mat rep, rep2;
-	    Rect cut = Rect(Point(70, 20), Point(350, 310));
-
-		rep = in(cut);
-			
-		resize(rep, rep2, Size(640, 480), 0, 0, 0);
-		in = rep2.clone();
-
-		inRange(in, Scalar(0, 0, 170), Scalar(200, 150, 255), out);
+		inRange(in, Scalar(0, 0, 80), Scalar(60, 255, 255), out);
 	    //extract_background();
 	    
 	    imshow("MOG", out);
@@ -203,7 +195,7 @@ void MDT::detect_and_track(){
 	   
 
 	    imshow("in", in);
-	    imshow("out", out);
+	    //imshow("out", out);
 
 	    key = waitKey(100);
 	}
