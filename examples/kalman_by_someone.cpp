@@ -1,7 +1,5 @@
-/******************************************
- * OpenCV Tutorial: Ball Tracking using   *
- * Kalman Filter                          *
- ******************************************/
+/*
+
  
 // Module "core"
 #include <opencv2/core/core.hpp>
@@ -218,4 +216,4 @@ using namespace std;
    // <<<<< Main loop
  
    return EXIT_SUCCESS;
-}
+}*/

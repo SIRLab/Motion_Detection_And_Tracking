@@ -1,3 +1,5 @@
+/*
+
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
@@ -32,7 +34,7 @@ int main(int, char**)
     help();
     Mat img(500, 500, CV_8UC3);
     KalmanFilter KF(2, 1, 0);
-    Mat state(2, 1, CV_32F); /* (phi, delta_phi) */
+    Mat state(2, 1, CV_32F); // (phi, delta_phi)
     Mat processNoise(2, 1, CV_32F);
     Mat measurement = Mat::zeros(1, 1, CV_32F);
     char code = (char)-1;
@@ -100,3 +102,5 @@ int main(int, char**)
 
     return 0;
 }
+
+*/
