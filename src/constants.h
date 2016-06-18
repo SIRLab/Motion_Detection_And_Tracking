@@ -14,4 +14,9 @@
 #define PROPORTION_MIN	0.70	// constante que define o quanto a figura pode sair do padrao de quadrado
 #define PROPORTION_MAX	1.35 	// constante que define o quanto a figura pode sair do padrao de quadrado
 
+/*#define AREA_MIN		0
+#define AREA_MAX		10000
+#define PROPORTION_MIN	0
+#define PROPORTION_MAX  10000*/
+
 #endif // _CONSTANTS_H_

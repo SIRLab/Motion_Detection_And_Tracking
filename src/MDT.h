@@ -30,7 +30,7 @@ protected:
 	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
 
-    Mat img;//(500, 500, CV_8UC3);
+	Point act_measurement;
 
     KalmanFilter KFX;
     Mat state_X;
@@ -55,10 +55,8 @@ protected:
 
 	double calcX(double x);
 	double calcY(double y);
-	void drawCross(Point center, Scalar color, int size);
+	void drawCross(Point center, Scalar color);
 	bool blobFilter(Rect);
-
-	//void detect_human();
 
 public:
 	MDT();
@@ -67,6 +65,7 @@ public:
 
 	void initKF();
 	void applyKF();
+	void applyKF_in();
 };
 
 #endif // _BACKGROUND_SUBTRACT_
