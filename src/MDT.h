@@ -1,3 +1,11 @@
+/*
+ * This file is part of the Motion_Detection_And_Tracking (MDT) project.
+ *
+ * This Source Code Form is subject to the terms of the GNU GENERAL PUBLIC LICENSE,
+ * v. 3.0. If a copy of the GPL was not distributed with this
+ * file, You can obtain one at http://www.gnu.org/licenses/gpl-3.0/.
+ */
+
 #ifndef _MDT_
 #define _MDT_
 
@@ -24,19 +32,22 @@ protected:
 
     Mat img;//(500, 500, CV_8UC3);
 
-    KalmanFilter KFX;//(2, 1, 0);
-    KalmanFilter KFY;//(2, 1, 0);
+    KalmanFilter KFX;
+    Mat state_X;
+    Mat prediction_X;
+    Mat processNoise_X;
+    Mat measurement_X;
 
-    Mat state_X;//(2, 1, CV_32F);
-    Mat state_Y;//(2, 1, CV_32F);
+    KalmanFilter KFY;
+    Mat state_Y;
+    Mat prediction_Y;
+    Mat processNoise_Y;
+    Mat measurement_Y;
 
-    Mat processNoise_X;//(2, 1, CV_32F);
-    Mat processNoise_Y;//(2, 1, CV_32F);
-
-    Mat measurement_X;// = Mat::zeros(1, 1, CV_32F);
-    Mat measurement_Y;// = Mat::zeros(1, 1, CV_32F);
+    float vx, vy, vt;
 
 	char key, code;
+	int loop;
 
 	void extract_background();
 	void get_countours();

@@ -1,7 +1,19 @@
+/*
+ * This file is part of the Motion_Detection_And_Tracking (MDT) project.
+ *
+ * This Source Code Form is subject to the terms of the GNU GENERAL PUBLIC LICENSE,
+ * v. 3.0. If a copy of the GPL was not distributed with this
+ * file, You can obtain one at http://www.gnu.org/licenses/gpl-3.0/.
+ */
+
+
 #include "MDT.h"
 
 MDT::MDT(){
 	pMOG2 = createBackgroundSubtractorMOG2();
+	vx = 0.001;
+	vy = 0.001;
+	loop = 0;
 }
 
 void MDT::extract_background(){
@@ -68,10 +80,8 @@ void MDT::applyKF(){
     randn(KFX.statePost, Scalar::all(0), Scalar::all(0.1));
     randn(KFY.statePost, Scalar::all(0), Scalar::all(0.1));
 
-    while(true){
-    	Point2f center(img.cols*0.5f, img.rows*0.5f);
-    	float R = img.cols/3.f;
 
+    while(true){
     	double state_x = state_X.at<float>(0);
     	double state_y = state_Y.at<float>(0);
 
@@ -80,8 +90,8 @@ void MDT::applyKF(){
         cout << "state" << endl;
         cout << state_X << endl;
 
-    	Mat prediction_X = KFX.predict();
-    	Mat prediction_Y = KFY.predict();
+    	prediction_X = KFX.predict();
+    	prediction_Y = KFY.predict();
 
         cout << "prediction" << endl;
         cout << prediction_X << endl;
@@ -89,6 +99,7 @@ void MDT::applyKF(){
     	double predict_x = prediction_X.at<float>(0);
     	double predict_y = prediction_Y.at<float>(0);
 
+    	//measurement_X.at<float>(0) = 5;
     	randn(measurement_X, Scalar::all(0), Scalar::all(KFX.measurementNoiseCov.at<float>(0)));
     	randn(measurement_Y, Scalar::all(0), Scalar::all(KFY.measurementNoiseCov.at<float>(0)));
 
@@ -109,9 +120,9 @@ void MDT::applyKF(){
 
     	img = Scalar::all(0);
 
-    	drawCross( Point(state_x, state_y), Scalar(255,255,255), 3 );
-    	drawCross( Point(meas_x, meas_y), Scalar(0,0,255), 3 );
-    	drawCross( Point(predict_x, predict_y), Scalar(0,255,0), 3 );
+    	drawCross( Point(state_x + 250, state_y + 250), Scalar(255,255,255), 3 );
+    	drawCross( Point(meas_x + 250, meas_y + 250), Scalar(0,0,255), 3 );
+    	drawCross( Point(predict_x + 250, predict_y + 250), Scalar(0,255,0), 3 );
 
     	if(theRNG().uniform(0,4) != 0){
         	KFX.correct(measurement_X);
@@ -124,8 +135,8 @@ void MDT::applyKF(){
         cout << "processNoise" << endl;
         cout << processNoise_X << endl;
 
-    	state_X = KFX.transitionMatrix*state_X + processNoise_X;
-    	state_Y = KFY.transitionMatrix*state_Y + processNoise_Y;
+    	state_X = KFX.transitionMatrix*state_X + processNoise_X + vx;
+    	state_Y = KFY.transitionMatrix*state_Y + processNoise_Y + vy;
 
         //cout << "transitionMatrix" << endl;
         //cout << KFX.transitionMatrix << endl;
