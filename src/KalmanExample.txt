@@ -15,8 +15,6 @@
 // Module "video"
 #include <opencv2/video/video.hpp>
  
-// Output
-#include 
  
 // Vector
 #include "vector.h"

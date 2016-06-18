@@ -10,7 +10,7 @@
 CCX = g++ -std=c++11 -w
 
 
-INCLUDES = -IUtils/database
+INCLUDES = -Idatabase -Isrc
 
 LIBRARIES_OPENCV = `pkg-config --cflags --libs opencv`
 
