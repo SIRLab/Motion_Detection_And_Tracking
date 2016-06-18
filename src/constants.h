@@ -9,6 +9,9 @@
 #ifndef _CONSTANTS_H_
 #define _CONSTANTS_H_
 
-#define DEBUG			// Allows the print in INPUT image
+#define AREA_MIN		200		// constante que define a area minima de busca dos robos
+#define AREA_MAX		7500	// constante que define a area maxima de busca dos robos
+#define PROPORTION_MIN	0.70	// constante que define o quanto a figura pode sair do padrao de quadrado
+#define PROPORTION_MAX	1.35 	// constante que define o quanto a figura pode sair do padrao de quadrado
 
 #endif // _CONSTANTS_H_

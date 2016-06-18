@@ -34,10 +34,9 @@ void MDT::get_countours(){
 	}
 
 	for( int i = 0; i< contours.size(); i++ ){
-		rectangle(in, Point(boundRect[i].x, boundRect[i].y), Point(boundRect[i].x + boundRect[i].width, boundRect[i].y + boundRect[i].height), Scalar(0,0,255));
-		//if(itsALabel(boundRect[i])){
-			//game.push_back(Point(boundRect[i].x + (boundRect[i].width/2), boundRect[i].y  + (boundRect[i].height/2)));
-		//}
+		if(blobFilter(boundRect[i])){
+			rectangle(in, Point(boundRect[i].x, boundRect[i].y), Point(boundRect[i].x + boundRect[i].width, boundRect[i].y + boundRect[i].height), Scalar(0,0,255));
+		}
 	}
 
 	labels.push_back(game);
@@ -52,6 +51,15 @@ void MDT::bisects_gray(){
 			cout << (int)p[0] << ", " << (int)p[1] << ", " << (int)p[2] << endl;
 		}
 	}*/
+}
+
+bool MDT::blobFilter(Rect rect){
+	float proportion = (float)rect.width/rect.height;
+
+	if((rect.width * rect.height) > AREA_MIN && (rect.width * rect.height) < AREA_MAX && proportion > PROPORTION_MIN && proportion < PROPORTION_MAX)
+		return true;
+	else
+		return false;
 }
 
 void MDT::applyKF(){

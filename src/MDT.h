@@ -56,7 +56,7 @@ protected:
 	double calcX(double x);
 	double calcY(double y);
 	void drawCross(Point center, Scalar color, int size);
-	
+	bool blobFilter(Rect);
 
 	//void detect_human();
 
