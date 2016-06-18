@@ -7,9 +7,12 @@ int main(){
 
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "unistd.h"
+#include "iostream"
 
 #include <stdio.h>
 
+using namespace std;
 using namespace cv;
 
 static inline Point calcPoint(Point2f center, double R, double angle){
@@ -17,12 +20,12 @@ static inline Point calcPoint(Point2f center, double R, double angle){
 }
 
 static inline double calcX(double x){
-	x += 200;
+	x += 20;
 	return x;
 }
 
 static inline double calcY(double y){
-	y += 200;
+	y += 20;
 	return y;
 }
 
@@ -35,6 +38,7 @@ static inline double calcY(double y){
 
 int main(){
 	srand(time(NULL));
+    int loop = 0;
 
     Mat img(500, 500, CV_8UC3);
 
@@ -55,6 +59,9 @@ int main(){
     /*inicio de alguma coisa rsrsrs*/{
     	randn(state_X, Scalar::all(0), Scalar::all(0.2));
     	randn(state_Y, Scalar::all(0), Scalar::all(0.2));
+
+        cout << "first state" << endl;
+        cout << state_X << endl;
 
     	KFX.transitionMatrix = (Mat_<float>(2, 2) << 1, 1, 0, 1);
     	KFY.transitionMatrix = (Mat_<float>(2, 2) << 1, 1, 0, 1);
@@ -79,11 +86,20 @@ int main(){
         	double state_x = state_X.at<float>(0);
         	double state_y = state_Y.at<float>(0);
 
+            if(loop % 3 == 0)
+            system("clear");
+            
+            cout << "state" << endl;
+            cout << state_X << endl;
+
         	double state_x_Pt = calcX(state_x);
         	double state_y_Pt = calcY(state_y);
 
         	Mat prediction_X = KFX.predict();
         	Mat prediction_Y = KFY.predict();
+
+            cout << "prediction" << endl;
+            cout << prediction_X << endl;
 
         	double predict_x = prediction_X.at<float>(0);
         	double predict_y = prediction_Y.at<float>(0);
@@ -94,8 +110,17 @@ int main(){
         	randn(measurement_X, Scalar::all(0), Scalar::all(KFX.measurementNoiseCov.at<float>(0)));
         	randn(measurement_Y, Scalar::all(0), Scalar::all(KFY.measurementNoiseCov.at<float>(0)));
 
+            cout << "measurement" << endl;
+            cout << measurement_X << endl;
+
         	measurement_X += KFX.measurementMatrix*state_X;
         	measurement_Y += KFY.measurementMatrix*state_Y;
+
+            //cout << "measurementMatrix" << endl;
+            //cout << KFX.measurementMatrix << endl;
+
+            cout << "measurement" << endl;
+            cout << measurement_X << endl;
 
         	double meas_x = measurement_X.at<float>(0);
         	double meas_y = measurement_Y.at<float>(0);
@@ -117,10 +142,23 @@ int main(){
         	randn( processNoise_X, Scalar(0), Scalar::all(sqrt(KFX.processNoiseCov.at<float>(0, 0))));
         	randn( processNoise_Y, Scalar(0), Scalar::all(sqrt(KFY.processNoiseCov.at<float>(0, 0))));
 
+            cout << "processNoise" << endl;
+            cout << processNoise_X << endl;
+
         	state_X = KFX.transitionMatrix*state_X + processNoise_X;
         	state_Y = KFY.transitionMatrix*state_Y + processNoise_Y;
 
+            //cout << "transitionMatrix" << endl;
+            //cout << KFX.transitionMatrix << endl;
+            
+            cout << endl;
         	imshow( "Kalman", img );
+            if(loop < 100){
+                loop++;
+                usleep(200000);
+            }else{
+                usleep(2000000);
+            }
 	        code = (char)waitKey(10);
 
 	        if( code > 0 )
@@ -173,8 +211,8 @@ int main_old(int, char**){
         drawCross( measPt, Scalar(0,0,255), 3 );
         drawCross( predictPt, Scalar(0,255,0), 3 );
 
-        if(theRNG().uniform(0,4) != 0)
-            KF.correct(measurement);
+        /*if(theRNG().uniform(0,4) != 0)
+            KF.correct(measurement);*/
 
         randn( processNoise, Scalar(0), Scalar::all(sqrt(KF.processNoiseCov.at<float>(0, 0))));
         state = KF.transitionMatrix*state + processNoise;
