@@ -22,8 +22,6 @@ protected:
 	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
 
-	int loop;
-
     Mat img;//(500, 500, CV_8UC3);
 
     KalmanFilter KFX;//(2, 1, 0);
@@ -38,7 +36,7 @@ protected:
     Mat measurement_X;// = Mat::zeros(1, 1, CV_32F);
     Mat measurement_Y;// = Mat::zeros(1, 1, CV_32F);
 
-	char key;
+	char key, code;
 
 	void extract_background();
 	void get_countours();
@@ -55,6 +53,8 @@ public:
 	MDT();
 
 	void detect_and_track();
+
+	void initKF();
 	void applyKF();
 };
 
