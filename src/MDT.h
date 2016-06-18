@@ -31,6 +31,7 @@ protected:
 	vector<Vec4i> hierarchy;
 
 	Point act_measurement;
+	Point old_measurement;
 
     KalmanFilter KFX;
     Mat state_X;
@@ -63,9 +64,9 @@ public:
 
 	void detect_and_track();
 
-	void initKF();
+	void initKF(Point ball = Point(0, 0));
+	void simKF();
 	void applyKF();
-	void applyKF_in();
 };
 
 #endif // _BACKGROUND_SUBTRACT_

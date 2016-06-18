@@ -10,6 +10,6 @@
 
 int main(){
 	MDT mdt;
-	//mdt.detect_and_track();
-    mdt.applyKF();
+	mdt.detect_and_track();
+    //mdt.simKF();
 }

@@ -35,6 +35,7 @@ void MDT::get_countours(){
 
 	for( int i = 0; i< contours.size(); i++ ){
 		if(blobFilter(boundRect[i])){
+			old_measurement = act_measurement;
 			drawCross(act_measurement, Scalar(255, 255, 255));
 			act_measurement = Point(boundRect[i].x + (boundRect[i].width/2), boundRect[i].y  + (boundRect[i].height/2));
 		}
@@ -63,7 +64,7 @@ bool MDT::blobFilter(Rect rect){
 		return false;
 }
 
-void MDT::applyKF_in(){
+void MDT::applyKF(){
 	double state_x = state_X.at<float>(0);
 	double state_y = state_Y.at<float>(0);
 
@@ -100,11 +101,11 @@ void MDT::applyKF_in(){
 	double meas_x = measurement_X.at<float>(0);
 	double meas_y = measurement_Y.at<float>(0);
 
-	in = Scalar::all(0);
+	//in = Scalar::all(0);	simulation
 
-	drawCross( Point(state_x + 250, state_y + 250), Scalar(255, 255, 255));
-	drawCross( Point(meas_x + 250, meas_y + 250), Scalar(0, 0, 255));
-	drawCross( Point(predict_x + 250, predict_y + 250), Scalar(0, 255, 0));
+	//drawCross(Point(state_x, state_y), Scalar(255, 255, 255));
+	//drawCross(Point(meas_x, meas_y), Scalar(0, 0, 255));
+	drawCross(Point(predict_x, predict_y), Scalar(0, 255, 0));
 
 	if(theRNG().uniform(0,4) != 0){
     	KFX.correct(measurement_X);
@@ -117,104 +118,23 @@ void MDT::applyKF_in(){
     cout << "processNoise" << endl;
     cout << processNoise_X << endl;
 
-	state_X = KFX.transitionMatrix*state_X + processNoise_X + dx;
-	state_Y = KFY.transitionMatrix*state_Y + processNoise_Y + dy;
+	//state_X = KFX.transitionMatrix*state_X + processNoise_X + dx; simulation
+	//state_Y = KFY.transitionMatrix*state_Y + processNoise_Y + dy; simulation
+
+    state_X = KFX.transitionMatrix*state_X + processNoise_X + ((act_measurement.x - old_measurement.x) *0.01);
+	state_Y = KFY.transitionMatrix*state_Y + processNoise_Y + ((act_measurement.y - old_measurement.y) *0.01);
 
     //cout << "transitionMatrix" << endl;
     //cout << KFX.transitionMatrix << endl;
     
     cout << endl;
-	imshow("Kalman", in);
+	//imshow("Kalman", in);
 }
 
-void MDT::applyKF(){
+void MDT::simKF(){
     initKF();
-
-	randn(state_X, Scalar::all(0), Scalar::all(0.2));
-	randn(state_Y, Scalar::all(0), Scalar::all(0.2));
-
-    cout << "first state" << endl;
-    cout << state_X << endl;
-
-	KFX.transitionMatrix = (Mat_<float>(2, 2) << 1, 1, 0, 1);
-	KFY.transitionMatrix = (Mat_<float>(2, 2) << 1, 1, 0, 1);
-
-	setIdentity(KFX.measurementMatrix);
-    setIdentity(KFX.processNoiseCov, Scalar::all(1e-5));
-    setIdentity(KFX.measurementNoiseCov, Scalar::all(/*1e-1*/5.0));
-    setIdentity(KFX.errorCovPost, Scalar::all(2.0));
-
-    setIdentity(KFY.measurementMatrix);
-    setIdentity(KFY.processNoiseCov, Scalar::all(1e-5));
-    setIdentity(KFY.measurementNoiseCov, Scalar::all(/*1e-1*/5.0));
-    setIdentity(KFY.errorCovPost, Scalar::all(2.0));
-
-    randn(KFX.statePost, Scalar::all(0), Scalar::all(0.1));
-    randn(KFY.statePost, Scalar::all(0), Scalar::all(0.1));
-
-
     while(true){
-    	double state_x = state_X.at<float>(0);
-    	double state_y = state_Y.at<float>(0);
-
-        system("clear");
-        
-        cout << "state" << endl;
-        cout << state_X << endl;
-
-    	prediction_X = KFX.predict();
-    	prediction_Y = KFY.predict();
-
-        cout << "prediction" << endl;
-        cout << prediction_X << endl;
-
-    	double predict_x = prediction_X.at<float>(0);
-    	double predict_y = prediction_Y.at<float>(0);
-
-    	//measurement_X.at<float>(0) = 5;
-    	randn(measurement_X, Scalar::all(0), Scalar::all(KFX.measurementNoiseCov.at<float>(0)));
-    	randn(measurement_Y, Scalar::all(0), Scalar::all(KFY.measurementNoiseCov.at<float>(0)));
-
-        cout << "measurement" << endl;
-        cout << measurement_X << endl;
-
-    	measurement_X += KFX.measurementMatrix*state_X;
-    	measurement_Y += KFY.measurementMatrix*state_Y;
-
-        //cout << "measurementMatrix" << endl;
-        //cout << KFX.measurementMatrix << endl;
-
-        cout << "measurement" << endl;
-        cout << measurement_X << endl;
-
-    	double meas_x = measurement_X.at<float>(0);
-    	double meas_y = measurement_Y.at<float>(0);
-
-    	in = Scalar::all(0);
-
-    	drawCross(Point(state_x + 250, state_y + 250), Scalar(255, 255, 255));
-    	drawCross(Point(meas_x + 250, meas_y + 250), Scalar(0, 0, 255));
-    	drawCross(Point(predict_x + 250, predict_y + 250), Scalar(0, 255, 0));
-
-    	if(theRNG().uniform(0,4) != 0){
-        	KFX.correct(measurement_X);
-        	KFY.correct(measurement_Y);
-    	}
-
-    	randn(processNoise_X, Scalar(0), Scalar::all(sqrt(KFX.processNoiseCov.at<float>(0, 0))));
-    	randn(processNoise_Y, Scalar(0), Scalar::all(sqrt(KFY.processNoiseCov.at<float>(0, 0))));
-
-        cout << "processNoise" << endl;
-        cout << processNoise_X << endl;
-
-    	state_X = KFX.transitionMatrix*state_X + processNoise_X + dx;
-    	state_Y = KFY.transitionMatrix*state_Y + processNoise_Y + dy;
-
-        //cout << "transitionMatrix" << endl;
-        //cout << KFX.transitionMatrix << endl;
-        
-        cout << endl;
-    	imshow("Kalman", in);
+    	applyKF();
 
         usleep(10000);
         code = (char)waitKey(10);
@@ -224,7 +144,7 @@ void MDT::applyKF(){
     }
 }
 
-void MDT::initKF(){
+void MDT::initKF(Point ball){
 	in = Mat(500, 500, CV_8UC3);
 
     KFX = KalmanFilter(2, 1, 0);
@@ -240,18 +160,8 @@ void MDT::initKF(){
     measurement_Y = Mat::zeros(1, 1, CV_32F);
 
     code = (char)-1;
-}
 
-void MDT::detect_and_track(){
-	//capture = VideoCapture(0);
-	//capture = VideoCapture("database/students/video.avi");
-	//capture = VideoCapture("database/vss/video.mp4");
-	capture = VideoCapture("database/ball/straight_1.mp4");
-	//initKalman();
-
-	initKF();
-
-	randn(state_X, Scalar::all(0), Scalar::all(0.2));
+    randn(state_X, Scalar::all(0), Scalar::all(0.2));
 	randn(state_Y, Scalar::all(0), Scalar::all(0.2));
 
     cout << "first state" << endl;
@@ -272,6 +182,16 @@ void MDT::detect_and_track(){
 
     randn(KFX.statePost, Scalar::all(0), Scalar::all(0.1));
     randn(KFY.statePost, Scalar::all(0), Scalar::all(0.1));
+}
+
+void MDT::detect_and_track(){
+	//capture = VideoCapture(0);
+	//capture = VideoCapture("database/students/video.avi");
+	//capture = VideoCapture("database/vss/video.mp4");
+	capture = VideoCapture("database/ball/straight_1.mp4");
+	//initKalman();
+
+	initKF();
 
 	while(true){
 		if(!capture.read(in) || key == 27) {
@@ -281,9 +201,11 @@ void MDT::detect_and_track(){
 	    }
 
 		inRange(in, Scalar(0, 0, 80), Scalar(60, 255, 255), out);
+
+		if(act_measurement.x != 0){
+			applyKF();
+		}
 	    //extract_background();
-	    
-	    imshow("MOG", out);
 	    
 	    medianBlur(out, out, 3);
 	    
