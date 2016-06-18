@@ -44,7 +44,7 @@ protected:
     Mat processNoise_Y;
     Mat measurement_Y;
 
-    float vx, vy, vt;
+    float dx, dy;
 
 	char key, code;
 	int loop;

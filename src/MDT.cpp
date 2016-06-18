@@ -11,8 +11,8 @@
 
 MDT::MDT(){
 	pMOG2 = createBackgroundSubtractorMOG2();
-	vx = 0.001;
-	vy = 0.001;
+	dx = 0.001;
+	dy = 0.001;
 	loop = 0;
 }
 
@@ -120,9 +120,9 @@ void MDT::applyKF(){
 
     	img = Scalar::all(0);
 
-    	drawCross( Point(state_x + 250, state_y + 250), Scalar(255,255,255), 3 );
-    	drawCross( Point(meas_x + 250, meas_y + 250), Scalar(0,0,255), 3 );
-    	drawCross( Point(predict_x + 250, predict_y + 250), Scalar(0,255,0), 3 );
+    	drawCross( Point(state_x, state_y + 250), Scalar(255,255,255), 3 );
+    	drawCross( Point(meas_x, meas_y + 250), Scalar(0,0,255), 3 );
+    	drawCross( Point(predict_x, predict_y + 250), Scalar(0,255,0), 3 );
 
     	if(theRNG().uniform(0,4) != 0){
         	KFX.correct(measurement_X);
@@ -135,14 +135,14 @@ void MDT::applyKF(){
         cout << "processNoise" << endl;
         cout << processNoise_X << endl;
 
-    	state_X = KFX.transitionMatrix*state_X + processNoise_X + vx;
-    	state_Y = KFY.transitionMatrix*state_Y + processNoise_Y + vy;
+    	state_X = KFX.transitionMatrix*state_X + processNoise_X + dx;
+    	state_Y = KFY.transitionMatrix*state_Y + processNoise_Y + dy;
 
         //cout << "transitionMatrix" << endl;
         //cout << KFX.transitionMatrix << endl;
         
         cout << endl;
-    	imshow( "Kalman", img );
+    	imshow("Kalman", img);
 
         usleep(10000);
         code = (char)waitKey(10);
